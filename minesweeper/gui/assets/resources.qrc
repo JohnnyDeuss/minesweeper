@@ -1,0 +1,35 @@
+<!DOCTYPE RCC><RCC version="1.0">
+<qresource>
+    <file>0.png</file>
+    <file>1.png</file>
+    <file>2.png</file>
+    <file>3.png</file>
+    <file>4.png</file>
+    <file>5.png</file>
+    <file>6.png</file>
+    <file>7.png</file>
+    <file>8.png</file>
+    <file>ssd0.png</file>
+    <file>ssd1.png</file>
+    <file>ssd2.png</file>
+    <file>ssd3.png</file>
+    <file>ssd4.png</file>
+    <file>ssd5.png</file>
+    <file>ssd6.png</file>
+    <file>ssd7.png</file>
+    <file>ssd8.png</file>
+    <file>ssd9.png</file>
+    <file>closed.png</file>
+    <file>question_mark.png</file>
+    <file>flag.png</file>
+    <file>flag_wrong.png</file>
+    <file>mine.png</file>
+    <file>mine_hit.png</file>
+    <file>reset.png</file>
+    <file>reset_won.png</file>
+    <file>reset_lost.png</file>
+    <file>reset_clicking.png</file>
+    <file>check_mark.png</file>
+    <file>logo.png</file>
+</qresource>
+</RCC>
