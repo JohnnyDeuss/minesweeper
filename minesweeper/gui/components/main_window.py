@@ -9,10 +9,13 @@ from .minefield import Minefield
 
 
 class MainWindow(QMainWindow):
-    def __init__(self):
+    def __init__(self, debug_mode=False):
+        """ :param debug: Whether to create the debug menu, allowing exporting of the state and ground truth of the
+                          game.
+        """
         super().__init__()
         self.setWindowTitle('Minesweeper')
-        self.setMenuBar(MenuBar(self))
+        self.setMenuBar(MenuBar(self, debug_mode))
         layout = QVBoxLayout(self)
         self.setCentralWidget(QWidget())
         self.centralWidget().setLayout(layout)

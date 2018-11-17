@@ -1,7 +1,6 @@
 """ Play minesweeper using the QT interface. To play it in the commandline interface, pass 'cmd' as a commandline
     argument.
 """
-from . import Minesweeper
 from .gui import MinesweeperGUI
 import sys
 
@@ -19,8 +18,6 @@ def enable_qt_exceptions():
     sys.excepthook = exception_hook     # And replace it with one that will print out exceptions.
 
 
-game = Minesweeper()
-game.set_config('expert')
 enable_qt_exceptions()
-gui = MinesweeperGUI(game)
+gui = MinesweeperGUI()
 gui.exec()

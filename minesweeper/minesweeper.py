@@ -237,7 +237,9 @@ class Minesweeper:
             self._timer = None
 
     def add_listener(self, listener):
-        """ Add a listener to be called when the timer is updated. This listener is a function. """
+        """ Add a listener to be called when the timer is updated.
+            :param listener: The listener, which is a callable objectg.
+        """
         # Only start the thread that deals with the timer if there are listeners.
         self._listeners.append(listener)
         # If the timer has already starter and there is no scheduler yet, start it.

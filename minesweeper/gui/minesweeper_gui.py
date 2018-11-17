@@ -1,28 +1,40 @@
-""" The QT application that acts as the controller for `Minesweepermain_window`."""
+""" The QT application that acts as the controller for `gui.main_window`."""
 from PyQt5.QtWidgets import QApplication, QAction, QActionGroup
 from PyQt5.QtGui import QPixmap, QPixmapCache
 
 from .components import MainWindow, ResetButton, Minefield, SevenSegmentDisplay
-from . import resources
+from .parser import parse_args
+from . import resources     # Loads the resources, even though not directly references.
+from .. import Minesweeper
 
 
 class MinesweeperGUI(QApplication):
-
-    def __init__(self, game):
+    def __init__(self):
         super().__init__([])
-        self.game = game
-        self.game.add_listener(self.update_timer)
+        args = parse_args()
+        self.game = Minesweeper()
         self.setup_cache()
-        self.main_window = MainWindow()
-        # Set up the reset button to actually reset the game.
+        self.main_window = MainWindow(args.debug)
+        self.connect_interface(args.debug)
+        self.set_config('expert')
+        self.main_window.show()
+        # Listen for timer updates.
+        self.game.add_listener(self.update_timer)
+
+    def connect_interface(self, debug_mode):
+        """ Connect this controller with the different interface components.
+            :param debug_mode: Whether we're in debug mode, meaning we have to connect some extras.
+        """
+        # Set up the reset button and the "New" menu item to reset the game.
         self.main_window.findChild(ResetButton).clicked.connect(self.reset)
-        # Set up the quit menu item to actually quit the application.
         self.main_window.findChild(QAction, 'new_menu_item').triggered.connect(self.reset)
+        # Set up the "Quit" menu item to quit the application.
         self.main_window.findChild(QAction, 'quit_menu_item').triggered.connect(self.quit)
         # Set up the difficulty menu items.
         self.main_window.findChild(QActionGroup).triggered.connect(self.difficulty_selected)
-        self.set_config('expert')
-        self.main_window.show()
+        if debug_mode:
+            self.main_window.findChild(QAction, 'log_state').triggered.connect(lambda: print(self.game.state))
+            self.main_window.findChild(QAction, 'log_mines').triggered.connect(lambda: print(self.game._mines))
 
     def setup_cache(self):
         """ Add a better lookup method to the QPixmapCache, that retrieves items from the cache, but on failure
@@ -36,17 +48,23 @@ class MinesweeperGUI(QApplication):
         QPixmapCache.find_or_get = find_or_get
 
     def set_config(self, difficulty, **kwargs):
-        """ Set the config. The kwargs are used to define width and height for 'custom' difficulty. """
+        """ Set the game's config. The kwargs are used to define width and height for 'custom' difficulty.
+            After setting the config, it updates the interface to match the new state.
+        """
         self.game.set_config(difficulty, **kwargs)
+        # Reset the counters.
         self.main_window.findChild(SevenSegmentDisplay, 'mine_counter').set_value(self.game.num_mines)
         self.main_window.findChild(SevenSegmentDisplay, 'timer').set_value(0)
+        # Reset the minefield.
         minefield = self.main_window.findChild(Minefield)
         minefield.set_shape(self.game.width, self.game.height)
+        # Connect the squares to the different actions that can occur when clicking them.
         for square in minefield.scene().items():
             square.left_clicked.connect(self.left_click_action)
             square.right_clicked.connect(self.right_click_action)
             square.mouse_down.connect(self.minefield_mouse_down)
             square.mouse_release.connect(self.minefield_mouse_release)
+        # Set the window to be the size of its contents.
         self.main_window.setFixedSize(0, 0)
         self.main_window.centralWidget().adjustSize()
 
