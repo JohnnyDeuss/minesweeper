@@ -10,7 +10,6 @@ class MenuBar(QMenuBar):
         self.addMenu(self._create_game_menu())
         if debug_mode:
             self.addMenu(self._create_debug_menu())
-
         #help_menu = QMenu(self)
         #help_menu.setTitle('&Help')
         #self.addMenu(help_menu)

@@ -1,22 +1,20 @@
-""" The QT application that acts as the controller for `gui.main_window`."""
+""" The QT application that acts as the controller for `gui.main_window`. """
 from PyQt5.QtWidgets import QApplication, QAction, QActionGroup
 from PyQt5.QtGui import QPixmap, QPixmapCache
 
 from .components import MainWindow, ResetButton, Minefield, SevenSegmentDisplay
-from .parser import parse_args
 from . import resources     # Loads the resources, even though not directly references.
 from .. import Minesweeper
 
 
 class MinesweeperGUI(QApplication):
-    def __init__(self):
+    def __init__(self, debug_mode=False, difficulty='expert', **kwargs):
         super().__init__([])
-        args = parse_args()
         self.game = Minesweeper()
         self.setup_cache()
-        self.main_window = MainWindow(args.debug)
-        self.connect_interface(args.debug)
-        self.set_config('expert')
+        self.main_window = MainWindow(debug_mode)
+        self.connect_interface(debug_mode)
+        self.set_config(difficulty, **kwargs)
         self.main_window.show()
         # Listen for timer updates.
         self.game.add_listener(self.update_timer)
@@ -36,14 +34,17 @@ class MinesweeperGUI(QApplication):
             self.main_window.findChild(QAction, 'log_state').triggered.connect(lambda: print(self.game.state))
             self.main_window.findChild(QAction, 'log_mines').triggered.connect(lambda: print(self.game._mines))
 
-    def setup_cache(self):
+    @staticmethod
+    def setup_cache():
         """ Add a better lookup method to the QPixmapCache, that retrieves items from the cache, but on failure
             retrieves it from the resources and caches it.
         """
         def find_or_get(path):
             pixmap = QPixmapCache.find(path)
             if pixmap is None:
-                return QPixmap(path)
+                pixmap = QPixmap(path)
+                QPixmapCache.insert(path, pixmap)
+                return pixmap
             return pixmap
         QPixmapCache.find_or_get = find_or_get
 

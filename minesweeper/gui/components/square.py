@@ -25,7 +25,7 @@ class Square(QGraphicsObject):
         else:
             self._pixmap = QPixmapCache.find_or_get(':{}.png'.format(state))
         if self._pixmap.isNull():
-            raise ValueError('The given state does not exist.')
+            raise ValueError('The given state ({}) does not exist.'.format(state))
 
     def paint(self, painter, option, widget=None):
         if self._pixmap is not None:

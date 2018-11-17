@@ -10,7 +10,7 @@ from .minefield import Minefield
 
 class MainWindow(QMainWindow):
     def __init__(self, debug_mode=False):
-        """ :param debug: Whether to create the debug menu, allowing exporting of the state and ground truth of the
+        """ :param debug_mode: Whether to create the debug menu, allowing exporting of the state and ground truth of the
                           game.
         """
         super().__init__()

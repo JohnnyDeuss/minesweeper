@@ -20,7 +20,7 @@ class ResetButton(QPushButton):
         else:
             icon = QIcon(':reset_{}.png'.format(state))
             if icon.isNull():
-                raise ValueError('The given state does not exist.')
+                raise ValueError('The given state ({}) does not exist.'.format(state))
         self.setIcon(icon)
 
     def objectName(self):

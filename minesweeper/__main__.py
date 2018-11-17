@@ -2,6 +2,7 @@
     argument.
 """
 from .gui import MinesweeperGUI
+from .parser import parse_args
 import sys
 
 
@@ -19,5 +20,6 @@ def enable_qt_exceptions():
 
 
 enable_qt_exceptions()
-gui = MinesweeperGUI()
+args = parse_args()
+gui = MinesweeperGUI(**vars(args))
 gui.exec()
