@@ -1,7 +1,7 @@
 """ The QT application that acts as the controller for `gui.main_window`. """
 from PyQt5.QtWidgets import QApplication, QAction, QActionGroup
 from PyQt5.QtGui import QPixmap, QPixmapCache
-from PyQt5.QtCore import pyqtSignal
+from PyQt5.QtCore import pyqtSignal, pyqtSlot
 
 from .components import MainWindow, ResetButton, Minefield, SevenSegmentDisplay
 from . import resources     # Loads the resources, even though not directly references.
@@ -111,9 +111,9 @@ class MinesweeperGUI(QApplication):
         if not self.game.done:
             self.reset_value_changed.emit('None')
 
-    def left_click_action(self):
+    @pyqtSlot(int, int)
+    def left_click_action(self, x, y):
         """ Attempt to dig at the given location. """
-        x, y = self.sender().x, self.sender().y
         done, opened = self.game.select(x, y)
         for square in opened:
             self.square_value_changed.emit(square.x, square.y, str(square.value))
@@ -123,9 +123,9 @@ class MinesweeperGUI(QApplication):
         self.move_ended.emit()
         self.processEvents()
 
-    def right_click_action(self):
+    @pyqtSlot(int, int)
+    def right_click_action(self, x, y):
         """ Attempt to place a flag or question mark at the given location. """
-        x, y = self.sender().x, self.sender().y
         if self.game.state[y][x] is None:
             if self.game.flag(x, y):
                 self.square_value_changed.emit(self.sender().x, self.sender().y, 'flag')

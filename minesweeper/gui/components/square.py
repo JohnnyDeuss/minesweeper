@@ -5,10 +5,10 @@ from PyQt5.QtCore import pyqtSignal, Qt, QRectF, pyqtSlot
 
 
 class Square(QGraphicsObject):
-    mouse_down = pyqtSignal()
+    mouse_down = pyqtSignal(int, int)
     mouse_release = pyqtSignal()
-    left_clicked = pyqtSignal()
-    right_clicked = pyqtSignal()
+    left_clicked = pyqtSignal(int, int)
+    right_clicked = pyqtSignal(int, int)
 
     def __init__(self, x, y):
         super().__init__()
@@ -43,7 +43,7 @@ class Square(QGraphicsObject):
 
     def mousePressEvent(self, event):
         self.pressed_buttons = event.buttons()
-        self.mouse_down.emit()
+        self.mouse_down.emit(self.x, self.y)
 
     def mouseReleaseEvent(self, event):
         # Only trigger if the mouse is released over the same square.
@@ -51,9 +51,9 @@ class Square(QGraphicsObject):
         target = self.scene().itemAt(event.scenePos(), QTransform())
         if isinstance(target, Square):
             if self.pressed_buttons == Qt.LeftButton:
-                target.left_clicked.emit()
+                target.left_clicked.emit(self.x, self.y)
             elif self.pressed_buttons == Qt.RightButton:
-                target.right_clicked.emit()
+                target.right_clicked.emit(self.x, self.y)
 
     def boundingRect(self):
         return QRectF(self.x*16, self.y*16, 16, 16)
