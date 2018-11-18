@@ -3,7 +3,7 @@
 """
 from PyQt5.QtWidgets import QHBoxLayout, QLabel, QWidget
 from PyQt5.QtGui import QPixmapCache
-from PyQt5.QtCore import Qt, QCoreApplication
+from PyQt5.QtCore import Qt, QCoreApplication, pyqtSlot
 
 
 class SevenSegmentDisplay(QWidget):
@@ -22,6 +22,7 @@ class SevenSegmentDisplay(QWidget):
         # Styling.
         self.setAttribute(Qt.WA_StyledBackground)
 
+    @pyqtSlot(int)
     def set_value(self, value):
         """ Set the value of the display. The display can show any positive value up to 999. Does not work with negative
             values.

@@ -48,7 +48,7 @@ class Minesweeper:
         elif difficulty == 'intermediate':
             width, height, num_mines = 16, 16, 40
         elif difficulty == 'expert':
-            width, height, num_mines = 32, 16, 99
+            width, height, num_mines = 30, 16, 99
         elif difficulty == 'custom':
             if not (0 < num_mines < width*height):
                 raise ValueError("The number of mines doesn't make sense")
@@ -78,6 +78,8 @@ class Minesweeper:
         """ Select a square at the given position. If the square hasn't been selected before, dig. If it's a number and
             the neighboring squares are marked with the same number of flags as that number, the remaining neighboring
             squares are opened.
+            :returns done: Whether the game has ended.
+            :returns opened: The squares that were opened and what their value is.
         """
         if self._start_time is None:
             self._start_timer()
