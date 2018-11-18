@@ -32,6 +32,7 @@ class MinesweeperGUI(QApplication):
         """ Connect this controller with the different interface components.
             :param debug_mode: Whether we're in debug mode, meaning we have to connect some extras.
         """
+        # Connect the exit button to
         # Set up the reset button and the "New" menu item to reset the game.
         reset_button = self.main_window.findChild(ResetButton)
         reset_button.clicked.connect(self.reset)
@@ -48,7 +49,7 @@ class MinesweeperGUI(QApplication):
         self.move_ended.connect(minefield.refresh)
         # Menu items.
         self.main_window.findChild(QAction, 'new_menu_item').triggered.connect(self.reset)
-        self.main_window.findChild(QAction, 'quit_menu_item').triggered.connect(self.quit)
+        self.main_window.findChild(QAction, 'quit_menu_item').triggered.connect(self.main_window.close)
         self.main_window.findChild(QActionGroup).triggered.connect(self.difficulty_selected)
         if debug_mode:
             self.main_window.findChild(QAction, 'log_state').triggered.connect(lambda: print(self.game.state))

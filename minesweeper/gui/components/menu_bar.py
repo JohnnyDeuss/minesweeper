@@ -49,6 +49,7 @@ class MenuBar(QMenuBar):
         # Quit action
         quit_action = QAction('Quit', self)
         quit_action.setObjectName('quit_menu_item')
+        game_menu.addAction(quit_action)
         return game_menu
 
     def _create_debug_menu(self):
