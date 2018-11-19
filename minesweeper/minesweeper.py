@@ -116,6 +116,7 @@ class Minesweeper:
                 # Mark the opened squares on the state.
                 for x, y, v in opened:
                     self.state[y][x] = v
+                self.done = True
                 return Result(True, opened)
             else:
                 # A safe square, open it.
