@@ -128,11 +128,11 @@ class MinesweeperGUI(QApplication):
         """ Attempt to place a flag or question mark at the given location. """
         if self.game.state[y][x] is None:
             if self.game.flag(x, y):
-                self.square_value_changed.emit(self.sender().x, self.sender().y, 'flag')
+                self.square_value_changed.emit(x, y, 'flag')
                 self.mine_counter_changed.emit(self.game.mines_left)
         else:
             if self.game.question(x, y):
-                self.square_value_changed.emit(self.sender().x, self.sender().y, self.game.state[y][x])
+                self.square_value_changed.emit(x, y, self.game.state[y][x])
                 self.mine_counter_changed.emit(self.game.mines_left)
         self.move_ended.emit()
 
