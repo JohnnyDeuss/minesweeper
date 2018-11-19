@@ -33,12 +33,15 @@ class Minesweeper:
             width        The number of squares along the width.
     """
     def __init__(self):
-        """ Start a minesweeper instance. """
-        self._timer = None        # The timer used to update observers about timer changes.
+        """ Start a minesweeper instance. A default instance will be generated with difficulty='intermediate' and
+            first_never_mine=True.
+        """
+        self._timer = None      # The timer used to update observers about timer changes.
         self._listeners = []    # The listeners that will get updated about timer changes.
-        self.set_config('intermediate')
+        self._mines = None      # Will hold the ground truth for mine locations as a 2D nested list of booleans.
+        self.set_config('intermediate', first_never_mine=True)
 
-    def set_config(self, difficulty, width=None, height=None, num_mines=None):
+    def set_config(self, difficulty, width=None, height=None, num_mines=None, first_never_mine=None):
         """ Set the difficulty to one of three presets: 'beginner', 'intermediate' and 'expert'. It's also possible to
             set the difficulty to 'custom', where you can, and have to, specify the width height and the number of mines
             yourself.
@@ -54,25 +57,35 @@ class Minesweeper:
                 raise ValueError("The number of mines doesn't make sense")
         else:
             raise ValueError('Invalid difficulty setting!')
+        if first_never_mine is not None:
+            self.first_never_mine = first_never_mine
         self.difficulty = difficulty
         self.height = height            # The height of each game.
-        self.width = width                # The width of each game.
-        self.num_mines = num_mines        # The number of mines to place on the board.
+        self.width = width              # The width of each game.
+        self.num_mines = num_mines      # The number of mines to place on the board.
         self.reset()
 
     def reset(self):
         """ Starts a new game. """
-        # Generate a 2D array with no mines.
-        self._mines = [[False for _ in range(self.width)] for _ in range(self.height)]
-        # Select `self.num_mines` random coordinates to place mines at.
-        for x, y in sample(self.squares(), self.num_mines):
-            self._mines[y][x] = True
         # Generate an empty state.        
         self.state = [[None for _ in range(self.width)] for _ in range(self.height)]
         self.done = False
         self.mines_left = self.num_mines
         self._start_time = None
         self._final_time = None
+
+    def _setup_mines(self, safe_square=None):
+        """ Setup the mines, not the state. The safe square allows generating a mine pattern that provides the
+            `first_never_mine` functionality.
+        """
+        self._mines = [[False for _ in range(self.width)] for _ in range(self.height)]
+        # Select `self.num_mines` random coordinates to place mines at.
+        possible_squares = self.squares()
+        # Make the safe square impossible if set.
+        if safe_square is not None:
+            possible_squares.remove(safe_square)
+        for x, y in sample(possible_squares, self.num_mines):
+            self._mines[y][x] = True
 
     def select(self, x, y):
         """ Select a square at the given position. If the square hasn't been selected before, dig. If it's a number and
@@ -81,6 +94,10 @@ class Minesweeper:
             :returns done: Whether the game has ended.
             :returns opened: The squares that were opened and what their value is.
         """
+        # Mines are only determined once a square is opened, to make to `first_never_mine` option possible.
+        if self._mines is None:
+            self._setup_mines(safe_square=(x, y) if self.first_never_mine else None)
+        # If the start time wasn't set yet, no square was opened yet, so start the timer.
         if self._start_time is None:
             self._start_timer()
         # If the game ended, nothing happens.
@@ -90,7 +107,6 @@ class Minesweeper:
         elif self.state[y][x] is None or self.state[y][x] == '?':
             # Mine, you're dead.
             if self._mines[y][x]:
-                self.done = True
                 self._stop_timer()
                 opened = [OpenedSquare(x, y, 'mine_hit')]
                 opened += [OpenedSquare(x, y, 'mine') for x, y in self.squares() if self._mines[y][x] and self.state[y][x] in [None, '?']]
@@ -200,8 +216,26 @@ class Minesweeper:
         return list(product(range(self.width), range(self.height)))
 
     #
-    ### From here on, the code deal with the timer.
+    # From here on, the code deal with the timer and updates.
     #
+    def time(self):
+        """ :returns: The time that has expired since the first square was opened. """
+        if self._final_time is not None:
+            return self._final_time
+        if self._start_time is None:
+            return 0
+        return int(time.time() - self._start_time)
+
+    def add_listener(self, listener):
+        """ Add a listener to be called when the timer is updated.
+            :param listener: The listener, which is a callable objectg.
+        """
+        # Only start the thread that deals with the timer if there are listeners.
+        self._listeners.append(listener)
+        # If the timer has already starter and there is no scheduler yet, start it.
+        if self._timer is None and self._start_time is not None:
+            self._start_scheduler()
+            
     def _start_timer(self):
         """ Start the timer. """
         self._start_time = time.time()
@@ -214,14 +248,6 @@ class Minesweeper:
         self._final_time = self.time()
         self._stop_scheduler()
 
-    def time(self):
-        """ :returns: The time that has expired since the first square was opened. """
-        if self._final_time is not None:
-            return self._final_time
-        if self._start_time is None:
-            return 0
-        return int(time.time() - self._start_time)
-
     def _start_scheduler(self):
         """ Start the scheduler thread that will notify listeners of timer changes. """
         if self._start_time is not None:
@@ -229,7 +255,7 @@ class Minesweeper:
             t_wait = ceil(t_diff) - t_diff
             if t_wait == 0:
                 t_wait = 1
-            self._timer = Timer(t_wait, self._update)
+            self._timer = Timer(t_wait, self._notify)
             self._timer.start()
 
     def _stop_scheduler(self):
@@ -238,23 +264,13 @@ class Minesweeper:
             self._timer.cancel()
             self._timer = None
 
-    def add_listener(self, listener):
-        """ Add a listener to be called when the timer is updated.
-            :param listener: The listener, which is a callable objectg.
-        """
-        # Only start the thread that deals with the timer if there are listeners.
-        self._listeners.append(listener)
-        # If the timer has already starter and there is no scheduler yet, start it.
-        if self._timer is None and self._start_time is not None:
-            self._start_scheduler()
-
     def remove_listener(self, listener):
         """ Remove a previously added timer listener. """ 
         self.listeners.remove(listener)
         if not self._listeners:
             self._stop_scheduler()
 
-    def _update(self):
+    def _notify(self):
         """ Update all observers about the timer change and queue up the next update. """
         # Call all listeners.
         for listener in self._listeners:
