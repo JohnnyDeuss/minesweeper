@@ -25,7 +25,7 @@ class MainWindow(QMainWindow):
         # Styling.
         layout.setSizeConstraint(layout.SetFixedSize)
         layout.setSpacing(0)
-        self.setWindowIcon(QIcon(':logo.png'))
+        self.setWindowIcon(QIcon(':logo.ico'))
         self.setAttribute(Qt.WA_StyledBackground, True)
         self.setStyleSheet('''
             * {
