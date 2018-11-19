@@ -67,7 +67,8 @@ class Minesweeper:
 
     def reset(self):
         """ Starts a new game. """
-        # Generate an empty state.        
+        # Generate an empty state.
+        self._mines = None
         self.state = [[None for _ in range(self.width)] for _ in range(self.height)]
         self.done = False
         self.mines_left = self.num_mines
@@ -77,6 +78,7 @@ class Minesweeper:
     def _setup_mines(self, safe_square=None):
         """ Setup the mines, not the state. The safe square allows generating a mine pattern that provides the
             `first_never_mine` functionality.
+            :param safe_square: The square that should remain free from mines as an (x, y) tuple.
         """
         self._mines = [[False for _ in range(self.width)] for _ in range(self.height)]
         # Select `self.num_mines` random coordinates to place mines at.
