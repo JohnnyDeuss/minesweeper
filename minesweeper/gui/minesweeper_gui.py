@@ -89,7 +89,8 @@ class MinesweeperGUI(QApplication):
 
     def set_config(self, difficulty, **kwargs):
         """ Set the game's config. The kwargs are used to define width and height for 'custom' difficulty.
-            After setting the config, it updates the interface to match the new state.
+            After setting the config, it updates the interface to match the new state. Also does the connecting of
+            slots/signals of the new minefield.
         """
         self.game.set_config(difficulty, **kwargs)
         # Reset the counters.
