@@ -1,4 +1,6 @@
 """ The QT application that acts as the controller for `gui.main_window`. """
+import sys
+
 from PyQt5.QtWidgets import QApplication, QAction, QActionGroup
 from PyQt5.QtGui import QPixmap, QPixmapCache
 from PyQt5.QtCore import pyqtSignal, pyqtSlot
@@ -19,6 +21,8 @@ class MinesweeperGUI(QApplication):
 
     def __init__(self, debug_mode=False, difficulty='expert', **kwargs):
         super().__init__([])
+        if debug_mode:
+            self.enable_qt_exceptions()
         self.game = Minesweeper()
         self.setup_cache()
         self.main_window = MainWindow(debug_mode)
@@ -27,6 +31,20 @@ class MinesweeperGUI(QApplication):
         self.main_window.show()
         # Listen for timer updates.
         self.game.add_listener(self.update_timer)
+
+    @staticmethod
+    def enable_qt_exceptions():
+        """ Qt doesn't do feedback from exceptions well, due to threads, so override the exception handling
+            to print out the exceptions and then pass it through to the original hook.
+        """
+        def exception_hook(exctype, value, traceback):
+            """ Print out any exception and pass it through to the original exception hook. """
+            print(exctype, value, traceback)
+            sys._excepthook(exctype, value, traceback)
+            sys.exit(1)
+
+        sys._excepthook = sys.excepthook  # Back up the original exception hook...
+        sys.excepthook = exception_hook  # And replace it with one that will print out exceptions.
 
     def connect_interface(self, debug_mode):
         """ Connect this controller with the different interface components.
@@ -138,7 +156,7 @@ class MinesweeperGUI(QApplication):
 
     def difficulty_selected(self, action):
         if action.objectName() == 'custom':
-            pass
+            pass    # Maybe later.
         elif action.objectName() != self.game.difficulty:
             self.set_config(action.objectName())
 

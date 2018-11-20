@@ -41,28 +41,29 @@ class Minesweeper:
         self._mines = None      # Will hold the ground truth for mine locations as a 2D nested list of booleans.
         self.set_config('intermediate', first_never_mine=True)
 
-    def set_config(self, difficulty, width=None, height=None, num_mines=None, first_never_mine=None):
+    def set_config(self, difficulty=None, width=None, height=None, num_mines=None, first_never_mine=None):
         """ Set the difficulty to one of three presets: 'beginner', 'intermediate' and 'expert'. It's also possible to
             set the difficulty to 'custom', where you can, and have to, specify the width height and the number of mines
             yourself.
         """
-        if difficulty == 'beginner':
-            width, height, num_mines = 8, 8, 10
-        elif difficulty == 'intermediate':
-            width, height, num_mines = 16, 16, 40
-        elif difficulty == 'expert':
-            width, height, num_mines = 30, 16, 99
-        elif difficulty == 'custom':
-            if not (0 < num_mines < width*height):
-                raise ValueError("The number of mines doesn't make sense")
-        else:
-            raise ValueError('Invalid difficulty setting!')
+        if difficulty is not None:
+            if difficulty == 'beginner':
+                width, height, num_mines = 8, 8, 10
+            elif difficulty == 'intermediate':
+                width, height, num_mines = 16, 16, 40
+            elif difficulty == 'expert':
+                width, height, num_mines = 30, 16, 99
+            elif difficulty == 'custom':
+                if not (0 < num_mines < width*height):
+                    raise ValueError("The number of mines doesn't make sense")
+            else:
+                raise ValueError('Invalid difficulty setting!')
+            self.difficulty = difficulty
+            self.height = height            # The height of each game.
+            self.width = width              # The width of each game.
+            self.num_mines = num_mines      # The number of mines to place on the board.
         if first_never_mine is not None:
             self.first_never_mine = first_never_mine
-        self.difficulty = difficulty
-        self.height = height            # The height of each game.
-        self.width = width              # The width of each game.
-        self.num_mines = num_mines      # The number of mines to place on the board.
         self.reset()
 
     def reset(self):
