@@ -111,8 +111,10 @@ class Minesweeper:
             if self._mines[y][x]:
                 self._stop_timer()
                 opened = [OpenedSquare(x, y, 'mine_hit')]
-                opened += [OpenedSquare(x, y, 'mine') for x, y in self.squares() if self._mines[y][x] and self.state[y][x] in [None, '?']]
-                opened += [OpenedSquare(x, y, 'flag_wrong') for x, y in self.squares() if not self._mines[y][x] and self.state[y][x] == 'flag']
+                opened += [OpenedSquare(xi, yi, 'mine') for xi, yi in self.squares()
+                           if self._mines[yi][xi] and self.state[yi][xi] in [None, '?'] and (x, y) != (xi, yi)]
+                opened += [OpenedSquare(xi, yi, 'flag_wrong') for xi, yi in self.squares()
+                           if not self._mines[yi][xi] and self.state[yi][xi] == 'flag']
                 # Mark the opened squares on the state.
                 for x, y, v in opened:
                     self.state[y][x] = v
