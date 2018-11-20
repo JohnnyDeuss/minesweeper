@@ -132,7 +132,7 @@ class MinesweeperGUI(QApplication):
                 self.mine_counter_changed.emit(self.game.mines_left)
         else:
             if self.game.question(x, y):
-                self.square_value_changed.emit(x, y, self.game.state[y][x])
+                self.square_value_changed.emit(x, y, str(self.game.state[y][x]))
                 self.mine_counter_changed.emit(self.game.mines_left)
         self.move_ended.emit()
 

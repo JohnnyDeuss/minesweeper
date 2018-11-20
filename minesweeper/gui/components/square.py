@@ -28,7 +28,6 @@ class Square(QGraphicsObject):
         """ Set the state of the square. Values must correspond to a value from `Minesweeper.state`.
             Numbers should be encoded as strings, so that state can be passed on to Qt's C++ backend as a QString.
         """
-        print(state)
         if state == 'None':
             self._pixmap = QPixmapCache.find_or_get(':closed.png')
         elif state == '?':
