@@ -1,6 +1,10 @@
 """ A minesweeper implementation. The functionality is exactly the same as the good ol' Windows Minesweeper: timer,
     mines, flags, question marks, auto-open when a zero is hit and auto-open when a number is clicked and the same
     number of neighbors have been flagged.
+
+    One of the few known differences to the original minesweeper is how the `first_never_mine` works. In the Windows 98
+    version, the mine under the mouse is moved to the upper-left corner. In this implementation, mines are uniformly
+    distributed in all squares without bias.
 """
 from random import sample
 from itertools import chain, product
@@ -14,32 +18,36 @@ class Minesweeper:
     """ A class that represents a minesweeper game.
 
         Attributes:
-            _listeners    A list of callables that will be called when the timer changes.
-            _final_time    The final timer time when the game ended, None if the game didn't end.
-            _mines        The ground truth of mines; a 2D nested list of boolean values, where True marks where a mines is located.
-            num_mines    The number of mines a game starts with when it's reset (for the number of mines left, see `mines_left`).
-            _start_time    The time at which the first square was opened (for the timer value, see `time`), None if no square was opened yet.
-            _timer        A `threading.Timer` object to update observers about timer changes.
-            difficulty    The set difficulty setting, must be either 'beginner', 'intermediate', 'expert' or 'custom'.
-            done        Whether the game has ended.
-            height        The number of squares along the height.
-            mines_left    The number of mines that are left unmarked in the game.
-            state        A 2D list of the game's state, which is public to the user. The following states are possible
-                        for individual squares: None for an unopened square, an integer (0-8) for open squares, 'flag'
-                        for squares with a flag placed on them, 'mine_hit' for a square that was opened with a mine
-                        under it, 'mine' for any unflagged squares with a mine under them after losing and 'flag_wrong'
-                        for a flag that was placed on the wrong square. 'mine', 'mine_hit' and 'flag_wrong' will only
-                        appear if you've lost the game.
-            width        The number of squares along the width.
+            _listeners        A list of callables that will be called when the timer changes.
+            _final_time       The final timer time when the game ended, None if the game didn't end.
+            _mines            The ground truth of mines; a 2D nested list of boolean values, where True marks where a
+                              mines is located.
+            num_mines         The number of mines a game starts with when it's reset (for the number of mines left, see
+                              `mines_left`).
+            _start_time       The time at which the first square was opened (for the timer value, see `time`), None if
+                              no square was opened yet.
+            _timer            A `threading.Timer` object to update observers about timer changes.
+            difficulty        The set difficulty setting, must be either 'beginner', 'intermediate', 'expert' or 'custom'.
+            done              Whether the game has ended.
+            first_never_mine  Whether the first click can hit a mine.
+            height            The number of squares along the height.
+            mines_left        The number of mines that are left unmarked in the game.
+            state             A 2D list of the game's state, which is public to the user. The following states are
+                              possible for individual squares: None for an unopened square, an integer (0-8) for open
+                              squares, 'flag' for squares with a flag placed on them, 'mine_hit' for a square that was
+                              opened with a mine under it, 'mine' for any unflagged squares with a mine under them after
+                              losing and 'flag_wrong' for a flag that was placed on the wrong square. 'mine', 'mine_hit'
+                              and 'flag_wrong' will only appear if you've lost the game.
+            width             The number of squares along the width.
     """
-    def __init__(self):
+    def __init__(self, difficulty='intermediate'):
         """ Start a minesweeper instance. A default instance will be generated with difficulty='intermediate' and
             first_never_mine=True.
         """
         self._timer = None      # The timer used to update observers about timer changes.
         self._listeners = []    # The listeners that will get updated about timer changes.
         self._mines = None      # Will hold the ground truth for mine locations as a 2D nested list of booleans.
-        self.set_config('intermediate', first_never_mine=True)
+        self.set_config(difficulty, first_never_mine=True)
 
     def set_config(self, difficulty=None, width=None, height=None, num_mines=None, first_never_mine=None):
         """ Set the difficulty to one of three presets: 'beginner', 'intermediate' and 'expert'. It's also possible to

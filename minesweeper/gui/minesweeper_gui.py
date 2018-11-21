@@ -93,6 +93,8 @@ class MinesweeperGUI(QApplication):
             slots/signals of the new minefield.
         """
         self.game.set_config(difficulty, **kwargs)
+        # Make sure the Game menu reflects the difficulty change.
+        self.main_window.findChild(QAction, difficulty).setChecked(True)
         # Reset the counters.
         self.mine_counter_changed.emit(self.game.num_mines)
         self.timer_changed.emit(0)
