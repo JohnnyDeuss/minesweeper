@@ -14,8 +14,9 @@ class ResetButton(QPushButton):
 
     @pyqtSlot(str)
     def set_state(self, state):
-        """ Set the state of the reset button, which is either "None", if the game is just going, "won", "lost" or
-            "clicking". "clicking" happens when the minefield is being clicked.
+        """ Set the state of the reset button, which is either the string "None", if the game is in progress, "won",
+            "lost" or "clicking". "clicking" happens when the minefield is being clicked and the open mouth icon is
+            being shown.
         """
         if state == 'None':
             icon = QIcon(':reset.png'.format())

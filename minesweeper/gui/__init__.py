@@ -1,4 +1,2 @@
-""" This package contains two GUIs for the minesweeper game, a commandline interface for easy debugging
-    and a proper Qt interface.
-"""
+""" This package contains a Qt GUI for the minesweeper game. """
 from .minesweeper_gui import MinesweeperGUI

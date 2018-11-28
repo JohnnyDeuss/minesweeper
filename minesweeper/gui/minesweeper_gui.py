@@ -6,7 +6,7 @@ from PyQt5.QtGui import QPixmap, QPixmapCache
 from PyQt5.QtCore import pyqtSignal, pyqtSlot
 
 from .components import MainWindow, ResetButton, Minefield, SevenSegmentDisplay
-from . import resources     # Loads the resources, even though not directly references.
+from . import resources     # Loads the resources, even though the module is not directly referenced.
 from .. import Minesweeper
 
 
@@ -34,7 +34,7 @@ class MinesweeperGUI(QApplication):
 
     @staticmethod
     def enable_qt_exceptions():
-        """ Qt doesn't do feedback from exceptions well, due to threads, so override the exception handling
+        """ Qt doesn't do feedback from exceptions well due to threads, so override the exception handling
             to print out the exceptions and then pass it through to the original hook.
         """
         def exception_hook(exctype, value, traceback):
@@ -44,23 +44,22 @@ class MinesweeperGUI(QApplication):
             sys.exit(1)
 
         sys._excepthook = sys.excepthook  # Back up the original exception hook...
-        sys.excepthook = exception_hook  # And replace it with one that will print out exceptions.
+        sys.excepthook = exception_hook   # And replace it with one that will print out exceptions.
 
     def connect_interface(self, debug_mode):
         """ Connect this controller with the different interface components.
             :param debug_mode: Whether we're in debug mode, meaning we have to connect some extras.
         """
-        # Connect the exit button to
         # Set up the reset button and the "New" menu item to reset the game.
         reset_button = self.main_window.findChild(ResetButton)
         reset_button.clicked.connect(self.reset)
         self.reset_value_changed.connect(reset_button.set_state)
-        # Connect SSD displays.
+        # Connect the SSD displays.
         self.timer_changed.connect(self.main_window.findChild(SevenSegmentDisplay, 'timer').set_value)
         self.mine_counter_changed.connect(self.main_window.findChild(SevenSegmentDisplay, 'mine_counter').set_value)
-        # Connect reset button.
+        # Connect the reset button.
         self.reset_value_changed.connect(reset_button.set_state)
-        # Connect minefield (reset + reshape).
+        # Connect the minefield.
         minefield = self.main_window.findChild(Minefield)
         self.game_reset.connect(minefield.reset)
         self.shape_changed.connect(minefield.set_shape)
@@ -69,13 +68,14 @@ class MinesweeperGUI(QApplication):
         self.main_window.findChild(QAction, 'new_menu_item').triggered.connect(self.reset)
         self.main_window.findChild(QAction, 'quit_menu_item').triggered.connect(self.main_window.close)
         self.main_window.findChild(QActionGroup).triggered.connect(self.difficulty_selected)
+        # Debug mode extras.
         if debug_mode:
             self.main_window.findChild(QAction, 'log_state').triggered.connect(lambda: print(self.game.state))
             self.main_window.findChild(QAction, 'log_mines').triggered.connect(lambda: print(self.game._mines))
 
     @staticmethod
     def setup_cache():
-        """ Add a better lookup method to the QPixmapCache, that retrieves items from the cache, but on failure
+        """ Add a better lookup method to the QPixmapCache; one that retrieves items from the cache, but on failure
             retrieves it from the resources and caches it.
         """
         def find_or_get(path):
@@ -90,10 +90,10 @@ class MinesweeperGUI(QApplication):
     def set_config(self, difficulty, **kwargs):
         """ Set the game's config. The kwargs are used to define width and height for 'custom' difficulty.
             After setting the config, it updates the interface to match the new state. Also does the connecting of
-            slots/signals of the new minefield.
+            slots and signals of the new minefield.
         """
         self.game.set_config(difficulty, **kwargs)
-        # Make sure the Game menu reflects the difficulty change.
+        # Make sure the Game menu's difficulty check mark reflects the difficulty change.
         self.main_window.findChild(QAction, difficulty).setChecked(True)
         # Reset the counters.
         self.mine_counter_changed.emit(self.game.num_mines)
@@ -164,5 +164,5 @@ class MinesweeperGUI(QApplication):
             self.set_config(action.objectName())
 
     def update_timer(self):
-        """ Caller by the minesweeper game whenever the timer changes. Updates the displayed time. """
+        """ Called by the minesweeper game whenever the timer changes. Updates the displayed time. """
         self.timer_changed.emit(self.game.time())

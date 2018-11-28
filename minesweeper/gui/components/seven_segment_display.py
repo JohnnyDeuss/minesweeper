@@ -1,5 +1,5 @@
-""" A seven segment display component for displaying numbers the minesweeper GUI.
-    Displays any positive values up to 999.
+""" A seven segment display component for displaying numbers the minesweeper GUI. Displays any positive values up to
+    999.
 """
 from PyQt5.QtWidgets import QHBoxLayout, QLabel, QWidget
 from PyQt5.QtGui import QPixmapCache
